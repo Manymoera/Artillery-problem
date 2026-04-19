@@ -1,0 +1,7 @@
+*.txt
+.venv
+.env
+build
+dist
+*.spec
+*.json

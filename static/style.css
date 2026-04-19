@@ -1,0 +1,112 @@
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --border-color: #333;
+    --text-color: #e0e0e0;
+    --accent-color: #4caf50;
+    --input-bg: #2a2a2a;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 700px;
+    box-sizing: border-box;
+}
+
+.card-title {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.drop-zone {
+    border: 2px dashed #444;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    color: #888;
+    transition: 0.3s;
+}
+
+.drop-zone:hover {
+    background: #252525;
+    border-color: #666;
+}
+
+.matrix-container {
+    display: grid;
+    gap: 5px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.cell {
+    width: 50px;
+    height: 45px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
+.cell.selected {
+    background: var(--accent-color);
+    color: white;
+    font-weight: bold;
+    border-color: #fff;
+}
+
+input[type="number"] {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    width: 60px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #ccc;
+}
+
+.result-box {
+    background: var(--input-bg);
+    padding: 12px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    margin-top: 5px;
+    border: 1px solid var(--border-color);
+}
