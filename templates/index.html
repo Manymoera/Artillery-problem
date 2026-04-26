@@ -1,92 +1,190 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <title>Задача</title>
+    <title>Артиллерия: Задача 2 + Динамика</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-    <h1>Задача об огневой мощи противника</h1>
-
     <div class="card">
-        <div class="card-title">Импорт данных</div>
-        <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
-            Нажмите для выбора JSON или перетащите файл сюда
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTask('task2', this)">Задача 2</button>
+            <button class="tab-btn" onclick="switchTask('task1', this)">Задача 1</button>
         </div>
-        <input type="file" id="fileInput" hidden onchange="handleFileUpload(this.files[0])">
+        <input type="hidden" id="taskType" value="task2">
+        <h2>Конфигурация системы</h2>
+        <div class="config-stack">
+            <div class="config-group">
+                <label for="sizeN">Размерность матрицы (n x n):</label>
+                <input type="number" id="sizeN" value="5" min="2" max="12" onchange="buildMatrixInputs()">
+            </div>
+
+            <div class="config-group">
+                <label for="repStrat">Стратегия врага (Распределение резервов R):</label>
+                <select id="repStrat">
+                    <option value="patching">Латание дыр (Восполнение слабых)</option>
+                    <option value="strengthening">Усиление сильных (Наращивание кулака)</option>
+                </select>
+            </div>
+
+            <div class="config-group">
+                <label for="strikeStrat">Ваша стратегия поражения (Тактика):</label>
+                <select id="strikeStrat">
+                    <option value="task2_math">Математическая оптимизация (Задача 2)</option>
+                    <option value="logistics_collapse">Логистический коллапс (Блокировка резервов)</option>
+                    <option value="focused_wear">Фокусированный износ (Синергия боя)</option>
+                    <option value="max_power">Жадный алгоритм (Самый сильный сегодня)</option>
+                </select>
+            </div>
+
+            <div class="config-group">
+                <label>Параметры боя (Интенсивность α | Резервы R | Коэфф. k):</label>
+                <div class="params-row">
+                    <input type="number" id="alpha" value="0.1" step="0.01" placeholder="alpha"
+                        title="Интенсивность боя (alpha)">
+                    <input type="number" id="resDaily" value="30" placeholder="R" title="Ежедневные резервы (R)">
+                    <input type="number" id="valK" value="2.0" step="0.1" placeholder="k"
+                        title="Коэффициент подавления (k)">
+                </div>
+            </div>
+
+            <div class="config-group" style="border-top: 1px solid #333; padding-top: 15px;">
+                <label for="jsonFile">Загрузить условия из JSON:</label>
+                <input type="file" id="jsonFile" accept=".json" onchange="loadJsonFile(this)">
+            </div>
+        </div>
     </div>
 
     <div class="card">
-        <div class="card-title">Параметры и Матрица</div>
-        <div style="margin-bottom: 15px;">
-            <label>Коэффициент k:</label>
-            <input type="number" id="kValue" value="2.0" step="0.1">
-        </div>
-        
-        <div id="matrixGrid" class="matrix-container"></div>
-        
-        <button onclick="submitTask()">Получить решение</button>
+        <h3>Ввод матрицы огневой мощи C</h3>
+        <div id="matrixInput" class="matrix-input-grid"></div>
+        <button onclick="startCalculation()">Рассчитать по Задаче 2</button>
     </div>
 
-    <div class="card">
-        <div class="card-title">Результаты анализа</div>
-        <label>Минимальная огневая мощь S5:</label>
-        <div id="outS5" class="result-box">-</div>
-        
-        <div style="margin-top:15px;">
-            <label>Максимальный значение функции S6:</label>
-            <div id="outS6" class="result-box">-</div>
+    <div id="resultsArea" style="display:none;">
+        <div class="card">
+            <h3>Оптимальное назначение (Засвечено зеленым)</h3>
+            <div id="matrixDisplay" class="result-matrix"></div>
+        </div>
+
+        <div class="card">
+            <h3>Лог динамики боя | Итог S5: <span id="s5Total" style="color:var(--accent)">0</span></h3>
+            <div id="battleLog"></div>
         </div>
     </div>
 
     <script>
-        let matrixData = [];
+        function switchTask(type, btn) {
+            document.getElementById('taskType').value = type;
 
-        function handleFileUpload(file) {
+            // Визуальное переключение кнопок
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Меняем текст на главной кнопке для ясности
+            const mainBtn = document.querySelector('button[onclick="startCalculation()"]');
+            mainBtn.innerText = type === 'task1' ? "Рассчитать по Задаче 1" : "Рассчитать по Задаче 2";
+        }
+
+        function buildMatrixInputs() {
+            const n = document.getElementById('sizeN').value;
+            const cont = document.getElementById('matrixInput');
+            cont.style.gridTemplateColumns = `repeat(${n}, 50px)`;
+            cont.innerHTML = '';
+            for (let i = 0; i < n * n; i++) {
+                cont.innerHTML += `<input type="number" class="m-in" value="${Math.floor(Math.random() * 40 + 10)}">`;
+            }
+        }
+
+        async function startCalculation() {
+            const n = parseInt(document.getElementById('sizeN').value);
+            const inputs = document.querySelectorAll('.m-in');
+            let matrix = [];
+            for (let i = 0; i < n; i++) {
+                let row = [];
+                for (let j = 0; j < n; j++) row.push(parseFloat(inputs[i * n + j].value));
+                matrix.push(row);
+            }
+
+            const res = await fetch('/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    matrix,
+                    k: document.getElementById('valK').value,
+                    intensity: document.getElementById('alpha').value,
+                    total_r: document.getElementById('resDaily').value,
+                    replenish_strat: document.getElementById('repStrat').value,
+                    strike_strat: document.getElementById('strikeStrat').value
+                })
+            });
+            const data = await res.json();
+
+            document.getElementById('resultsArea').style.display = 'block';
+            document.getElementById('s5Total').innerText = data.total_s5;
+
+            const display = document.getElementById('matrixDisplay');
+            display.style.gridTemplateColumns = `repeat(${n}, 50px)`;
+            display.innerHTML = '';
+            matrix.forEach((row, i) => {
+                row.forEach((val, j) => {
+                    const isSel = data.selections.some(s => s.row === i && s.col === j);
+                    display.innerHTML += `<div class="cell ${isSel ? 'selected' : ''}">${val}</div>`;
+                });
+            });
+
+            const log = document.getElementById('battleLog');
+            log.innerHTML = '';
+            data.history.forEach(h => {
+                log.innerHTML += `
+                    <div class="log-item">
+                        <span><strong>День ${h.day}</strong>: Удар по подр. #${h.target}</span>
+                        <span>Мощь: [${h.powers.join(', ')}]</span>
+                        <span style="color:var(--accent)">Σ=${h.sum}</span>
+                    </div>`;
+            });
+        }
+
+        function loadJsonFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const json = JSON.parse(e.target.result);
-                matrixData = json.matrix;
-                renderMatrix();
+            reader.onload = function (e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    if (data.n) {
+                        document.getElementById('sizeN').value = data.n;
+                        buildMatrixInputs();
+                    }
+                    if (data.rep_strat) document.getElementById('repStrat').value = data.rep_strat;
+                    if (data.strike_strat) document.getElementById('strikeStrat').value = data.strike_strat;
+                    if (data.alpha) document.getElementById('alpha').value = data.alpha;
+                    if (data.r) document.getElementById('resDaily').value = data.r;
+                    if (data.k) document.getElementById('valK').value = data.k;
+
+                    if (data.matrix) {
+                        setTimeout(() => {
+                            const inputs = document.querySelectorAll('.m-in');
+                            const flatMatrix = data.matrix.flat();
+                            inputs.forEach((input, i) => {
+                                if (flatMatrix[i] !== undefined) input.value = flatMatrix[i];
+                            });
+                        }, 50);
+                    }
+                } catch (err) {
+                    alert("Ошибка при чтении JSON: " + err.message);
+                }
             };
             reader.readAsText(file);
         }
 
-        function renderMatrix(selections = []) {
-            const grid = document.getElementById('matrixGrid');
-            const n = matrixData.length;
-            if (n === 0) return;
-
-            grid.style.gridTemplateColumns = `repeat(${n}, 50px)`;
-            grid.innerHTML = '';
-
-            matrixData.forEach((row, i) => {
-                row.forEach((val, j) => {
-                    const isSelected = selections.some(s => s.row === i && s.col === j);
-                    const cell = document.createElement('div');
-                    cell.className = `cell ${isSelected ? 'selected' : ''}`;
-                    cell.textContent = val;
-                    grid.appendChild(cell);
-                });
-            });
-        }
-
-        async function submitTask() {
-            if (matrixData.length === 0) return alert("Сначала загрузите матрицу!");
-
-            const k = document.getElementById('kValue').value;
-            const response = await fetch('/solve', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ matrix: matrixData, k: k })
-            });
-            
-            const result = await response.json();
-            document.getElementById('outS5').textContent = result.s5;
-            document.getElementById('outS6').textContent = result.s6;
-            renderMatrix(result.selections);
-        }
+        buildMatrixInputs();
     </script>
 </body>
+
 </html>
