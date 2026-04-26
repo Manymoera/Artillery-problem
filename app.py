@@ -26,9 +26,7 @@ def calculate():
     history = []
     visual_selections = []
     
-    # =================================================================
     # ЛОГИКА ЗАДАЧИ 1 (Строго по документу: Статика)
-    # =================================================================
     if task_type == 'task1':
         # 1. Поиск оптимальных назначений по исходной матрице C
         row_ind, col_ind = linear_sum_assignment(C, maximize=True)
@@ -57,9 +55,12 @@ def calculate():
                 "sum": round(day_sum, 2)
             })
         
+        s6_final = history[-1]['sum'] 
+
         return jsonify({
             "history": history,
             "total_s5": round(total_s, 2),
+            "total_s6": round(s6_final, 2),
             "selections": visual_selections
         })
 
@@ -131,9 +132,12 @@ def calculate():
                 "sum": round(day_sum, 2)
             })
 
+        s6_final = current_powers.sum()
+
         return jsonify({
             "history": history,
             "total_s5": round(total_s5, 2),
+            "total_s6": round(s6_final, 2), # Добавили S6
             "selections": visual_selections
         })
 

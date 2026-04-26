@@ -71,7 +71,11 @@
         </div>
 
         <div class="card">
-            <h3>Лог динамики боя | Итог S5: <span id="s5Total" style="color:var(--accent)">0</span></h3>
+            <h3>
+                Лог динамики боя |
+                Итог S5: <span id="s5Total" style="color:var(--accent)">0</span> |
+                S6 (Остаток): <span id="s6Total" style="color:#ff4444">0</span>
+            </h3>
             <div id="battleLog"></div>
         </div>
     </div>
@@ -152,6 +156,7 @@
 
             document.getElementById('resultsArea').style.display = 'block';
             document.getElementById('s5Total').innerText = data.total_s5;
+            document.getElementById('s6Total').innerText = data.total_s6;
 
             const display = document.getElementById('matrixDisplay');
             display.style.gridTemplateColumns = `repeat(${n}, 50px)`;
