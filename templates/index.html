@@ -80,11 +80,36 @@
         function switchTask(type, btn) {
             document.getElementById('taskType').value = type;
 
-            // Визуальное переключение кнопок
+            // Визуальное переключение кнопок табов
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // Меняем текст на главной кнопке для ясности
+            // Скрываем или показываем динамические настройки
+            // Задача 1 не использует стратегии и резервы по документу
+            const configStack = document.querySelector('.config-stack');
+            const dynamicGroups = configStack.querySelectorAll('.config-group');
+
+            // Индексы групп: 1 - стратегия врага, 2 - тактика, 3 - параметры боя (частично)
+            if (type === 'task1') {
+                dynamicGroups[1].style.opacity = "0.3";
+                dynamicGroups[1].style.pointerEvents = "none";
+                dynamicGroups[2].style.opacity = "0.3";
+                dynamicGroups[2].style.pointerEvents = "none";
+                document.getElementById('alpha').style.opacity = "0.3";
+                document.getElementById('resDaily').style.opacity = "0.3";
+                document.getElementById('alpha').disabled = true;
+                document.getElementById('resDaily').disabled = true;
+            } else {
+                dynamicGroups[1].style.opacity = "1";
+                dynamicGroups[1].style.pointerEvents = "all";
+                dynamicGroups[2].style.opacity = "1";
+                dynamicGroups[2].style.pointerEvents = "all";
+                document.getElementById('alpha').style.opacity = "1";
+                document.getElementById('resDaily').style.opacity = "1";
+                document.getElementById('alpha').disabled = false;
+                document.getElementById('resDaily').disabled = false;
+            }
+
             const mainBtn = document.querySelector('button[onclick="startCalculation()"]');
             mainBtn.innerText = type === 'task1' ? "Рассчитать по Задаче 1" : "Рассчитать по Задаче 2";
         }
@@ -114,6 +139,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     matrix,
+                    task_type: document.getElementById('taskType').value,
                     k: document.getElementById('valK').value,
                     intensity: document.getElementById('alpha').value,
                     total_r: document.getElementById('resDaily').value,
@@ -121,6 +147,7 @@
                     strike_strat: document.getElementById('strikeStrat').value
                 })
             });
+
             const data = await res.json();
 
             document.getElementById('resultsArea').style.display = 'block';
