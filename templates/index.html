@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Артиллерия: Задача 2 + Динамика</title>
+    <title>Артиллерия</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -18,25 +18,25 @@
         <h2>Конфигурация системы</h2>
         <div class="config-stack">
             <div class="config-group">
-                <label for="sizeN">Размерность матрицы (n x n):</label>
+                <label for="sizeN">Размерность матрицы:</label>
                 <input type="number" id="sizeN" value="5" min="2" max="12" onchange="buildMatrixInputs()">
             </div>
 
             <div class="config-group">
                 <label for="repStrat">Стратегия врага (Распределение резервов R):</label>
                 <select id="repStrat">
-                    <option value="patching">Латание дыр (Восполнение слабых)</option>
-                    <option value="strengthening">Усиление сильных (Наращивание кулака)</option>
+                    <option value="patching">Восполнение слабых</option>
+                    <option value="strengthening">Усиление сильных</option>
                 </select>
             </div>
 
             <div class="config-group">
-                <label for="strikeStrat">Ваша стратегия поражения (Тактика):</label>
+                <label for="strikeStrat">Стратегия поражения:</label>
                 <select id="strikeStrat">
                     <option value="task2_math">Математическая оптимизация (Задача 2)</option>
-                    <option value="logistics_collapse">Логистический коллапс (Блокировка резервов)</option>
-                    <option value="focused_wear">Фокусированный износ (Синергия боя)</option>
-                    <option value="max_power">Жадный алгоритм (Самый сильный сегодня)</option>
+                    <option value="logistics_collapse">Логистический коллапс</option>
+                    <option value="focused_wear">Фокусированный износ</option>
+                    <option value="max_power">Жадный алгоритм</option>
                 </select>
             </div>
 
@@ -66,7 +66,7 @@
 
     <div id="resultsArea" style="display:none;">
         <div class="card">
-            <h3>Оптимальное назначение (Засвечено зеленым)</h3>
+            <h3>Оптимальное назначение</h3>
             <div id="matrixDisplay" class="result-matrix"></div>
         </div>
 
@@ -74,7 +74,7 @@
             <h3>
                 Лог динамики боя |
                 Итог S5: <span id="s5Total" style="color:var(--accent)">0</span> |
-                S6 (Остаток): <span id="s6Total" style="color:#ff4444">0</span>
+                S6: <span id="s6Total" style="color:#ff4444">0</span>
             </h3>
             <div id="battleLog"></div>
         </div>

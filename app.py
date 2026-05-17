@@ -64,9 +64,7 @@ def calculate():
             "selections": visual_selections
         })
 
-    # =================================================================
-    # ЛОГИКА ЗАДАЧИ 2 (Динамика + Стратегии)
-    # =================================================================
+    # ЛОГИКА ЗАДАЧИ 2
     else:
         # 1. Предварительный расчет для математической стратегии
         schedule = {}
@@ -85,7 +83,6 @@ def calculate():
         hit_units = []
 
         for j in range(n):
-            # ВЫБОР ЦЕЛИ (Target Selection)
             if strike_strat == 'task2_math':
                 target = schedule[j]
             else:
@@ -103,7 +100,7 @@ def calculate():
 
             if target != -1:
                 visual_selections.append({"row": int(target), "col": j})
-                active_k[target] = 2 # В Задаче 2 эффект длится 2 периода
+                active_k[target] = 2
 
             # ПРИМЕНЕНИЕ ЭФФЕКТА И БОЯ
             eff_powers = np.copy(current_powers)
